@@ -1,7 +1,7 @@
 /*
- * This file is part of lamp, licensed under the MIT License.
+ * This file is part of kotlin-default-args-util, licensed under the MIT License.
  *
- *  Copysecond (c) Revxrsal <reflxction.github@gmail.com>
+ *  Copyright (c) Revxrsal <reflxction.github@gmail.com>
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -10,7 +10,7 @@
  *  copies of the Software, and to permit persons to whom the Software is
  *  furnished to do so, subject to the following conditions:
  *
- *  The above copysecond notice and this permission notice shall be included in all
+ *  The above copyright notice and this permission notice shall be included in all
  *  copies or substantial portions of the Software.
  *
  *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
@@ -32,7 +32,6 @@ import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static java.util.Collections.addAll;
@@ -45,13 +44,16 @@ final class MethodHandlesCallerFactory implements MethodCallerFactory {
 
     public static final MethodHandlesCallerFactory INSTANCE = new MethodHandlesCallerFactory();
 
-    @Override public @NotNull MethodCaller createFor(@NotNull Method method) throws Throwable {
+    @Override
+    public @NotNull MethodCaller createFor(@NotNull Method method) throws Throwable {
         if (!method.isAccessible()) method.setAccessible(true);
         MethodHandle handle = MethodHandles.lookup().unreflect(method);
         String methodString = method.toString();
         boolean isStatic = Modifier.isStatic(method.getModifiers());
         return new MethodCaller() {
-            @SneakyThrows @Override public Object call(@Nullable Object instance, Object... arguments) {
+            @SneakyThrows
+            @Override
+            public Object call(@Nullable Object instance, Object... arguments) {
                 if (!isStatic) {
                     List<Object> args = new ArrayList<>();
                     args.add(instance);
@@ -61,13 +63,15 @@ final class MethodHandlesCallerFactory implements MethodCallerFactory {
                 return handle.invokeWithArguments(arguments);
             }
 
-            @Override public String toString() {
+            @Override
+            public String toString() {
                 return "MethodHandlesCaller(" + methodString + ")";
             }
         };
     }
 
-    @Override public String toString() {
+    @Override
+    public String toString() {
         return "MethodHandlesCallerFactory";
     }
 }
