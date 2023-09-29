@@ -32,7 +32,6 @@ import revxrsal.args.reflect.MethodWrapper;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -141,7 +140,7 @@ public final class DefaultFunctionFinder {
     private static @NotNull BoundMethodCaller bindTwice(Method method, Object singleton) {
         MethodCaller caller = MethodCaller.wrap(method);
         return arguments -> {
-            Object[] boundArgs = ArrayUtils.addFirst(arguments, singleton);
+            Object[] boundArgs = ArrayUtils.insertAtBeginning(arguments, singleton);
             return caller.call(singleton, boundArgs);
         };
     }

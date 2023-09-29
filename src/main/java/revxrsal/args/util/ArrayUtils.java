@@ -35,7 +35,7 @@ public final class ArrayUtils {
 
     @Contract(pure = true, value = "null, _ -> fail; _, _ -> new")
     @CheckReturnValue
-    public static <T> Object[] addFirst(
+    public static <T> Object[] insertAtBeginning(
             @NotNull T[] original,
             @Nullable T item
     ) {
