@@ -35,6 +35,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import static java.lang.reflect.Modifier.isStatic;
 import static revxrsal.args.DefaultFunctionFinder.findDefaultFunction;
 import static revxrsal.args.util.CollectionUtils.getOrNull;
 import static revxrsal.args.util.CollectionUtils.mapKeys;
@@ -81,26 +82,26 @@ final class KotlinFunctionImpl implements KotlinFunction {
     }
 
     @Override
-    public Object call(@NotNull List<Object> arguments, @NotNull Function<Parameter, Boolean> isOptional) {
+    public <T> T call(@NotNull List<Object> arguments, @NotNull Function<Parameter, Boolean> isOptional) {
         Map<Parameter, Object> callArgs = mapArgsToParams(i -> getOrNull(arguments, i));
         return callByParameters(callArgs, isOptional);
     }
 
     @Override
-    public Object callByIndices(@NotNull Map<Integer, Object> arguments, @NotNull Function<Parameter, Boolean> isOptional) {
+    public <T> T callByIndices(@NotNull Map<Integer, Object> arguments, @NotNull Function<Parameter, Boolean> isOptional) {
         Map<Parameter, Object> callArgs = mapArgsToParams(arguments::get);
         return callByParameters(callArgs, isOptional);
     }
 
     @Override
-    public Object callByNames(@NotNull Map<String, Object> arguments, @NotNull Function<Parameter, Boolean> isOptional) {
+    public <T> T callByNames(@NotNull Map<String, Object> arguments, @NotNull Function<Parameter, Boolean> isOptional) {
         return callByParameters(mapKeys(arguments, this::getParameter), isOptional);
     }
 
     // Re-adapted from KCallableImpl.callBy
     @SuppressWarnings("unchecked")
     @Override
-    public Object callByParameters(
+    public <T> T callByParameters(
             @NotNull Map<Parameter, Object> arguments,
             @NotNull Function<Parameter, Boolean> isOptional
     ) {
@@ -138,7 +139,7 @@ final class KotlinFunctionImpl implements KotlinFunction {
         }
 
         if (!anyOptional)
-            return mainMethod.call(args.toArray());
+            return (T) mainMethod.call(args.toArray());
 
         CallableMethod defaultMethod = this.defaultMethod.get();
 
@@ -151,7 +152,7 @@ final class KotlinFunctionImpl implements KotlinFunction {
         // DefaultConstructorMarker or MethodHandle
         args.add(null);
 
-        return defaultMethod.call(args.toArray());
+        return (T) defaultMethod.call(args.toArray());
     }
 
     @NotNull

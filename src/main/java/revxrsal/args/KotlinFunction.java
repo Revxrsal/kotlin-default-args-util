@@ -104,7 +104,7 @@ public interface KotlinFunction {
      * @param <T>        The function return type
      * @return The function return value
      */
-    Object call(
+    <T> T call(
             @NotNull List<Object> arguments,
             @NotNull Function<Parameter, Boolean> isOptional
     );
@@ -141,7 +141,7 @@ public interface KotlinFunction {
      * @param <T>        The function return type
      * @return The function return value
      */
-    Object callByIndices(
+    <T> T callByIndices(
             @NotNull Map<Integer, Object> arguments,
             @NotNull Function<Parameter, Boolean> isOptional
     );
@@ -169,9 +169,10 @@ public interface KotlinFunction {
      *                   <p>
      *                   This parameter is necessary as it allows us to drop
      *                   the dependency on kotlin-reflect.
+     * @param <T>        The function return type
      * @return The function return value
      */
-    Object callByParameters(
+    <T> T callByParameters(
             @NotNull Map<Parameter, Object> arguments,
             @NotNull Function<Parameter, Boolean> isOptional
     );
@@ -202,7 +203,7 @@ public interface KotlinFunction {
      * @param <T>        The function return type
      * @return The function return value
      */
-    Object callByNames(
+    <T> T callByNames(
             @NotNull Map<String, Object> arguments,
             @NotNull Function<Parameter, Boolean> isOptional
     );
