@@ -1,7 +1,5 @@
 # kotlin-default-args
 
-## kotlin-default-args-util
-
 **kotlin-default-args-util** is a library that attempts to bring two of the most prominent features in Kotlin to the
 Java reflection world:
 
