@@ -21,56 +21,76 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  *  SOFTWARE.
  */
-package revxrsal.args.reflect;
+package revxrsal.args;
 
-import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import revxrsal.args.reflect.MethodCaller.BoundMethodCaller;
 import revxrsal.args.util.Preconditions;
 
 import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
 
-public final class MethodWrapper implements BoundMethodCaller {
+/**
+ * A utility class that combines a {@link Method} with a {@link BoundMethodCaller}.
+ * <p>
+ * This class is immutable, therefore is safe to share across multiple
+ * threads.
+ */
+public final class CallableMethod implements BoundMethodCaller {
 
-    @Getter
+    /**
+     * The method wrapped by this class
+     */
     private final Method method;
+
+    /**
+     * The bound method caller
+     */
     private final BoundMethodCaller caller;
 
-    MethodWrapper(@NotNull Method method, @NotNull BoundMethodCaller caller) {
+    /**
+     * Creates a new {@link CallableMethod} that wraps the given method and
+     * caller.
+     *
+     * @param method The method to wrap
+     * @param caller The bound method caller
+     */
+    CallableMethod(@NotNull Method method, @NotNull BoundMethodCaller caller) {
         this.method = method;
         this.caller = caller;
     }
 
-    public Class<?> getDeclaringClass() {
-        return method.getDeclaringClass();
-    }
-
-    public String getName() {
-        return method.getName();
-    }
-
-    public Class<?>[] getParameterTypes() {
-        return method.getParameterTypes();
-    }
-
-    public int getParameterCount() {
-        return method.getParameterCount();
-    }
-
-    public Parameter[] getParameters() {
-        return method.getParameters();
-    }
-
+    /**
+     * Calls the method of this caller
+     *
+     * @param arguments Invoking arguments
+     * @return The return result
+     */
     @Override
     public Object call(Object... arguments) {
         return caller.call(arguments);
     }
 
-    public static MethodWrapper of(@NotNull Method method, @NotNull BoundMethodCaller caller) {
+    /**
+     * Returns the method wrapped by this callable method
+     *
+     * @return The underlying method
+     */
+    public @NotNull Method getMethod() {
+        return method;
+    }
+
+    /**
+     * Creates a new {@link CallableMethod} that wraps the given method and
+     * caller.
+     *
+     * @param method The method to wrap
+     * @param caller The bound method caller
+     * @return A new {@link CallableMethod}
+     */
+    public static @NotNull CallableMethod of(@NotNull Method method, @NotNull BoundMethodCaller caller) {
         Preconditions.checkNotNull(method, "method");
         Preconditions.checkNotNull(caller, "caller");
-        return new MethodWrapper(method, caller);
+        return new CallableMethod(method, caller);
     }
 
 }

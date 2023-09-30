@@ -69,24 +69,17 @@ public interface MethodCaller {
          */
         Object call(Object... arguments);
 
-        /**
-         * Binds this caller to the specified instance. Calls from the bound method
-         * caller will no longer need an instance to call from.
-         *
-         * @param instance Instance to invoke from. Can be null in case of static
-         *                 methods.
-         * @return The bound method caller
-         */
-        default BoundMethodCaller bindTo(@Nullable Object instance) {
-            return arguments -> call(instance, arguments);
-        }
-
     }
 
+    /**
+     * A quick function to wrap the given method
+     *
+     * @param method Method to wrap into a {@link MethodCaller}
+     * @return The method caller
+     */
     @SneakyThrows
     static MethodCaller wrap(@NotNull Method method) {
         Preconditions.checkNotNull(method, "method");
         return MethodCallerFactory.methodHandles().createFor(method);
     }
-
 }

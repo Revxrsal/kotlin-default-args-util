@@ -20,25 +20,40 @@ import java.util.function.Supplier;
 
 import static revxrsal.args.util.Preconditions.checkNotNull;
 
+/**
+ * Re-adapted from Guava's Suppliers class, to use the MemoizingSupplier (renamed
+ * to LazySupplier)
+ */
 public final class Suppliers {
 
     private Suppliers() {
     }
 
-    public static <T> @NotNull Supplier<T> memoize(@NotNull Supplier<T> fetch) {
+    /**
+     * Creates a {@link Supplier} that fetches the value upon request at first,
+     * then serves it in subsequent calls.
+     * <p>
+     * This implementation is thread-safe as it performs
+     * synchronization on the first call.
+     *
+     * @param <T>   Supplier type
+     * @param fetch Fetch function
+     * @return The lazy supplier
+     */
+    public static <T> @NotNull Supplier<T> lazy(@NotNull Supplier<T> fetch) {
         checkNotNull(fetch, "fetch supplier");
-        return new MemoizingSupplier<>(fetch);
+        return new LazySupplier<>(fetch);
     }
 
-    static final class MemoizingSupplier<T extends @Nullable Object> implements Supplier<T> {
+    static final class LazySupplier<T extends @Nullable Object> implements Supplier<T> {
         final Supplier<T> delegate;
         transient volatile boolean initialized;
-        // "value" does not need to be volatile; visibility piggy-backs
+        // "value" does not need to be volatile; visibility piggybacks
         // on volatile read of "initialized".
         @Nullable
         transient T value;
 
-        MemoizingSupplier(Supplier<T> delegate) {
+        LazySupplier(Supplier<T> delegate) {
             this.delegate = delegate;
         }
 

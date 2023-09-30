@@ -27,8 +27,14 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.reflect.Method;
 import java.util.Objects;
 
+import static java.lang.reflect.Modifier.isStatic;
+
+/**
+ * A utility class for checking argument preconditions
+ */
 public final class Preconditions {
 
     private Preconditions() {
@@ -43,4 +49,11 @@ public final class Preconditions {
     public static @NotNull <T> T checkNotNull(@Nullable T value, @NotNull String message) {
         return Objects.requireNonNull(value, message + " cannot be null!");
     }
+
+    public static void checkCallableStatic(@Nullable Object instance, @NotNull Method method) {
+        if (instance == null && !isStatic(method.getModifiers()))
+            throw new IllegalArgumentException("The given method is not static, and no instance was provided. "
+                    + "Either mark the function as static with @JvmStatic, or pass the object/companion object value for the instance.");
+    }
+
 }

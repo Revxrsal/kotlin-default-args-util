@@ -14,9 +14,8 @@ dependencies {
     compileOnly("org.projectlombok:lombok:1.18.30")
     annotationProcessor("org.projectlombok:lombok:1.18.30")
 
-    implementation("org.jetbrains:annotations:24.0.1")
+    compileOnly("org.jetbrains:annotations:24.0.1")
     implementation(kotlin("stdlib-jdk8"))
-    implementation(kotlin("reflect"))
 }
 
 kotlin {
