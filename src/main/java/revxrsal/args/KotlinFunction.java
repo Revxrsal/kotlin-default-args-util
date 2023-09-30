@@ -34,8 +34,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-import static java.lang.reflect.Modifier.isStatic;
-
 /**
  * A simple wrapper around a function declared in Kotlin. This
  * interface simplifies taking advantage of Kotlin's default
@@ -49,7 +47,7 @@ public interface KotlinFunction {
 
     /**
      * Generates a {@link KotlinFunction} for the given {@link Method}.
-     *
+     * <p>
      * Notes:
      * <ul>
      *     <li>If the function is inside an object or a companion object, and
@@ -62,7 +60,7 @@ public interface KotlinFunction {
      * </ul>
      *
      * @param instance The instance. See the above note.
-     * @param method The method to wrap
+     * @param method   The method to wrap
      * @return
      */
     static @NotNull KotlinFunction wrap(@Nullable Object instance, @NotNull Method method) {
@@ -74,6 +72,11 @@ public interface KotlinFunction {
         );
     }
 
+    /**
+     * Tests whether is this function suspend or not
+     *
+     * @return If this function is suspend or not
+     */
     boolean isSuspend();
 
     /**
@@ -101,7 +104,7 @@ public interface KotlinFunction {
      * @param <T>        The function return type
      * @return The function return value
      */
-    <T> T call(
+    Object call(
             @NotNull List<Object> arguments,
             @NotNull Function<Parameter, Boolean> isOptional
     );
@@ -138,7 +141,7 @@ public interface KotlinFunction {
      * @param <T>        The function return type
      * @return The function return value
      */
-    <T> T callByIndices(
+    Object callByIndices(
             @NotNull Map<Integer, Object> arguments,
             @NotNull Function<Parameter, Boolean> isOptional
     );
@@ -166,10 +169,9 @@ public interface KotlinFunction {
      *                   <p>
      *                   This parameter is necessary as it allows us to drop
      *                   the dependency on kotlin-reflect.
-     * @param <T>        The function return type
      * @return The function return value
      */
-    <T> T callByParameters(
+    Object callByParameters(
             @NotNull Map<Parameter, Object> arguments,
             @NotNull Function<Parameter, Boolean> isOptional
     );
@@ -200,7 +202,7 @@ public interface KotlinFunction {
      * @param <T>        The function return type
      * @return The function return value
      */
-    <T> T callByNames(
+    Object callByNames(
             @NotNull Map<String, Object> arguments,
             @NotNull Function<Parameter, Boolean> isOptional
     );
