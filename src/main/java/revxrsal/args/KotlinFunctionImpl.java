@@ -105,15 +105,15 @@ final class KotlinFunctionImpl implements KotlinFunction {
             @NotNull Map<Parameter, Object> arguments,
             @NotNull Function<Parameter, Boolean> isOptional
     ) {
-        List<Object> args = new ArrayList<>();
+        List<Object> args = new ArrayList<>(parameters.size());
         int mask = 0;
         List<Integer> masks = new ArrayList<>(1);
-        int maskIndex = 0;
+        int index = 0;
 
         boolean anyOptional = false;
 
         for (Parameter parameter : parameters) {
-            if (maskIndex != 0 && maskIndex % Integer.SIZE == 0) {
+            if (index != 0 && index % Integer.SIZE == 0) {
                 masks.add(mask);
                 mask = 0;
             }
@@ -126,16 +126,15 @@ final class KotlinFunctionImpl implements KotlinFunction {
             // Parameter is not present
 
             else if (isOptional.apply(parameter)) {
-                mask = mask | 1 << maskIndex % 32;
+                mask = mask | 1 << index % 32;
                 args.add(defaultPrimitiveValue(parameter.getType()));
                 anyOptional = true;
-                continue;
             } else if (parameter.isVarArgs()) {
                 args.add(Array.newInstance(parameter.getType(), 0));
             } else {
                 throw new IllegalArgumentException("No argument provided for a required parameter: " + parameter + ".");
             }
-            maskIndex++;
+            index++;
         }
 
         if (!anyOptional)
