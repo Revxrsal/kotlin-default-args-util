@@ -24,18 +24,18 @@
 package revxrsal.args;
 
 import org.jetbrains.annotations.NotNull;
-import revxrsal.args.reflect.MethodCaller.BoundMethodCaller;
+import revxrsal.args.reflect.MethodCaller;
 import revxrsal.args.util.Preconditions;
 
 import java.lang.reflect.Method;
 
 /**
- * A utility class that combines a {@link Method} with a {@link BoundMethodCaller}.
+ * A utility class that combines a {@link Method} with a {@link MethodCaller}.
  * <p>
  * This class is immutable, therefore is safe to share across multiple
  * threads.
  */
-public final class CallableMethod implements BoundMethodCaller {
+public final class CallableMethod {
 
     /**
      * The method wrapped by this class
@@ -43,9 +43,9 @@ public final class CallableMethod implements BoundMethodCaller {
     private final Method method;
 
     /**
-     * The bound method caller
+     * The method caller
      */
-    private final BoundMethodCaller caller;
+    private final MethodCaller caller;
 
     /**
      * Creates a new {@link CallableMethod} that wraps the given method and
@@ -54,20 +54,9 @@ public final class CallableMethod implements BoundMethodCaller {
      * @param method The method to wrap
      * @param caller The bound method caller
      */
-    CallableMethod(@NotNull Method method, @NotNull BoundMethodCaller caller) {
+    CallableMethod(@NotNull Method method, @NotNull MethodCaller caller) {
         this.method = method;
         this.caller = caller;
-    }
-
-    /**
-     * Calls the method of this caller
-     *
-     * @param arguments Invoking arguments
-     * @return The return result
-     */
-    @Override
-    public Object call(Object... arguments) {
-        return caller.call(arguments);
     }
 
     /**
@@ -80,6 +69,15 @@ public final class CallableMethod implements BoundMethodCaller {
     }
 
     /**
+     * The method caller
+     *
+     * @return The method caller
+     */
+    public @NotNull MethodCaller getCaller() {
+        return caller;
+    }
+
+    /**
      * Creates a new {@link CallableMethod} that wraps the given method and
      * caller.
      *
@@ -87,7 +85,7 @@ public final class CallableMethod implements BoundMethodCaller {
      * @param caller The bound method caller
      * @return A new {@link CallableMethod}
      */
-    public static @NotNull CallableMethod of(@NotNull Method method, @NotNull BoundMethodCaller caller) {
+    public static @NotNull CallableMethod of(@NotNull Method method, @NotNull MethodCaller caller) {
         Preconditions.checkNotNull(method, "method");
         Preconditions.checkNotNull(caller, "caller");
         return new CallableMethod(method, caller);

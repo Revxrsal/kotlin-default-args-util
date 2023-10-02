@@ -70,7 +70,7 @@ public final class CollectionUtils {
     /**
      * Returns an element at the given [index] or `null` if the [index] is out of bounds of this array.
      */
-    public static <T> T getOrNull(T[] array, int index) {
+    public static <T> @Nullable T getOrNull(T[] array, int index) {
         return (index >= 0 && index <= lastIndex(array)) ? array[index] : null;
     }
 

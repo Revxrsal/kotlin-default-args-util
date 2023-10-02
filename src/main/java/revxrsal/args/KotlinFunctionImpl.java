@@ -26,7 +26,7 @@ package revxrsal.args;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Unmodifiable;
-import revxrsal.args.reflect.MethodCaller.BoundMethodCaller;
+import revxrsal.args.reflect.MethodCaller;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
@@ -35,13 +35,13 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import static java.lang.reflect.Modifier.isStatic;
 import static revxrsal.args.DefaultFunctionFinder.findDefaultFunction;
 import static revxrsal.args.util.CollectionUtils.getOrNull;
 import static revxrsal.args.util.CollectionUtils.mapKeys;
 import static revxrsal.args.util.KotlinConstants.continuation;
 import static revxrsal.args.util.KotlinConstants.defaultPrimitiveValue;
 import static revxrsal.args.util.KotlinSingletons.getCallerForNonDefault;
+import static revxrsal.args.util.Preconditions.checkCallableStatic;
 import static revxrsal.args.util.Suppliers.lazy;
 
 final class KotlinFunctionImpl implements KotlinFunction {
@@ -57,12 +57,11 @@ final class KotlinFunctionImpl implements KotlinFunction {
     private final Supplier<@Nullable CallableMethod> defaultMethod;
     private final @Unmodifiable List<Parameter> parameters;
 
-    public KotlinFunctionImpl(@Nullable Object instance, Method mainMethod) {
-
-        BoundMethodCaller mainCaller = getCallerForNonDefault(mainMethod, instance);
+    public KotlinFunctionImpl(@NotNull Method mainMethod) {
+        MethodCaller mainCaller = getCallerForNonDefault(mainMethod);
         this.parameters = Arrays.asList(mainMethod.getParameters());
         this.mainMethod = CallableMethod.of(mainMethod, mainCaller);
-        this.defaultMethod = lazy(() -> findDefaultFunction(instance, mainMethod));
+        this.defaultMethod = lazy(() -> findDefaultFunction(mainMethod));
     }
 
     @Override
@@ -82,29 +81,43 @@ final class KotlinFunctionImpl implements KotlinFunction {
     }
 
     @Override
-    public <T> T call(@NotNull List<Object> arguments, @NotNull Function<Parameter, Boolean> isOptional) {
+    public <T> T call(
+            @Nullable Object instance,
+            @NotNull List<Object> arguments,
+            @NotNull Function<Parameter, Boolean> isOptional
+    ) {
         Map<Parameter, Object> callArgs = mapArgsToParams(i -> getOrNull(arguments, i));
-        return callByParameters(callArgs, isOptional);
+        return callByParameters(instance, callArgs, isOptional);
     }
 
     @Override
-    public <T> T callByIndices(@NotNull Map<Integer, Object> arguments, @NotNull Function<Parameter, Boolean> isOptional) {
+    public <T> T callByIndices(
+            @Nullable Object instance,
+            @NotNull Map<Integer, Object> arguments,
+            @NotNull Function<Parameter, Boolean> isOptional
+    ) {
         Map<Parameter, Object> callArgs = mapArgsToParams(arguments::get);
-        return callByParameters(callArgs, isOptional);
+        return callByParameters(instance, callArgs, isOptional);
     }
 
     @Override
-    public <T> T callByNames(@NotNull Map<String, Object> arguments, @NotNull Function<Parameter, Boolean> isOptional) {
-        return callByParameters(mapKeys(arguments, this::getParameter), isOptional);
+    public <T> T callByNames(
+            @Nullable Object instance,
+            @NotNull Map<String, Object> arguments,
+            @NotNull Function<Parameter, Boolean> isOptional
+    ) {
+        return callByParameters(instance, mapKeys(arguments, this::getParameter), isOptional);
     }
 
     // Re-adapted from KCallableImpl.callBy
     @SuppressWarnings("unchecked")
     @Override
     public <T> T callByParameters(
+            @Nullable Object instance,
             @NotNull Map<Parameter, Object> arguments,
             @NotNull Function<Parameter, Boolean> isOptional
     ) {
+        checkCallableStatic(instance, mainMethod.getMethod());
         List<Object> args = new ArrayList<>(parameters.size());
         int mask = 0;
         List<Integer> masks = new ArrayList<>(1);
@@ -138,7 +151,7 @@ final class KotlinFunctionImpl implements KotlinFunction {
         }
 
         if (!anyOptional)
-            return (T) mainMethod.call(args.toArray());
+            return (T) mainMethod.getCaller().call(instance, args.toArray());
 
         CallableMethod defaultMethod = this.defaultMethod.get();
 
@@ -151,7 +164,7 @@ final class KotlinFunctionImpl implements KotlinFunction {
         // DefaultConstructorMarker or MethodHandle
         args.add(null);
 
-        return (T) defaultMethod.call(args.toArray());
+        return (T) defaultMethod.getCaller().call(instance, args.toArray());
     }
 
     @NotNull

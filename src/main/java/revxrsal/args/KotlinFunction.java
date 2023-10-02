@@ -47,29 +47,13 @@ public interface KotlinFunction {
 
     /**
      * Generates a {@link KotlinFunction} for the given {@link Method}.
-     * <p>
-     * Notes:
-     * <ul>
-     *     <li>If the function is inside an object or a companion object, and
-     *     does not have {@code JvmStatic}, the instance must be the respective
-     *     object/companion object
-     *     </li>
-     *     <li>If the function is static, {@code instance} can be null</li>
-     *     <li>If the function is inside a normal class (or data class),
-     *     it </li>
-     * </ul>
      *
-     * @param instance The instance. See the above note.
-     * @param method   The method to wrap
-     * @return
+     * @param method The method to wrap
+     * @return The wrapper {@link KotlinFunction}
      */
-    static @NotNull KotlinFunction wrap(@Nullable Object instance, @NotNull Method method) {
+    static @NotNull KotlinFunction wrap(@NotNull Method method) {
         Preconditions.checkNotNull(method, "method");
-        Preconditions.checkCallableStatic(instance, method);
-        return new KotlinFunctionImpl(
-                instance,
-                method
-        );
+        return new KotlinFunctionImpl(method);
     }
 
     /**
@@ -86,6 +70,7 @@ public interface KotlinFunction {
      * <p>
      * To use the default value of a parameter, pass a {@code null} in its place.
      *
+     * @param instance   Instance to call the function with
      * @param arguments  The arguments to invoke with
      * @param isOptional A function that guides this invocation
      *                   into knowing which parameters are optional,
@@ -105,6 +90,7 @@ public interface KotlinFunction {
      * @return The function return value
      */
     <T> T call(
+            @Nullable Object instance,
             @NotNull List<Object> arguments,
             @NotNull Function<Parameter, Boolean> isOptional
     );
@@ -123,6 +109,7 @@ public interface KotlinFunction {
      * </pre>
      * in which the second parameter will use its default value.
      *
+     * @param instance   Instance to call the function with
      * @param arguments  The arguments to invoke with
      * @param isOptional A function that guides this invocation
      *                   into knowing which parameters are optional,
@@ -142,6 +129,7 @@ public interface KotlinFunction {
      * @return The function return value
      */
     <T> T callByIndices(
+            @Nullable Object instance,
             @NotNull Map<Integer, Object> arguments,
             @NotNull Function<Parameter, Boolean> isOptional
     );
@@ -154,6 +142,7 @@ public interface KotlinFunction {
      * without having to rely on names or indexes. See {@link #getParameters()}
      * and {@link #getParametersByName()}.
      *
+     * @param instance   Instance to call the function with
      * @param arguments  The arguments to invoke with
      * @param isOptional A function that guides this invocation
      *                   into knowing which parameters are optional,
@@ -173,6 +162,7 @@ public interface KotlinFunction {
      * @return The function return value
      */
     <T> T callByParameters(
+            @Nullable Object instance,
             @NotNull Map<Parameter, Object> arguments,
             @NotNull Function<Parameter, Boolean> isOptional
     );
@@ -185,6 +175,7 @@ public interface KotlinFunction {
      * the ones at compile-time, in which cases, the function will throw
      * an exception if an invalid name was provided.
      *
+     * @param instance   Instance to call the function with
      * @param arguments  The arguments to invoke with
      * @param isOptional A function that guides this invocation
      *                   into knowing which parameters are optional,
@@ -204,6 +195,7 @@ public interface KotlinFunction {
      * @return The function return value
      */
     <T> T callByNames(
+            @Nullable Object instance,
             @NotNull Map<String, Object> arguments,
             @NotNull Function<Parameter, Boolean> isOptional
     );

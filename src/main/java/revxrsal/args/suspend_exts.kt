@@ -34,16 +34,18 @@ import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
  * Otherwise, calls the suspend function with current continuation.
  */
 suspend fun <T> KotlinFunction.callSuspend(
+    instance: Any?,
     arguments: List<Any?>,
     isOptional: (Parameter) -> Boolean
 ): T {
     if (!isSuspend) {
         // Function is not suspend
-        return call(arguments, isOptional)
+        return call(instance, arguments, isOptional)
     }
 
     val result = suspendCoroutineUninterceptedOrReturn<T> { continuation ->
         call(
+            instance,
             arguments + continuation,
             isOptional
         )
@@ -65,17 +67,19 @@ suspend fun <T> KotlinFunction.callSuspend(
  * Otherwise, calls the suspend function with current continuation.
  */
 suspend fun <T> KotlinFunction.callByNamesSuspend(
+    instance: Any?,
     arguments: Map<String, Any?>,
     isOptional: (Parameter) -> Boolean
 ): T {
     val lastParameter = parameters.last()
     if (lastParameter.type != continuation()) {
         // Function is not suspend
-        return callByNames(arguments, isOptional)
+        return callByNames(instance, arguments, isOptional)
     }
 
     val result = suspendCoroutineUninterceptedOrReturn<T> { continuation ->
         callByNames(
+            instance,
             arguments + (lastParameter.name to continuation),
             isOptional
         )
@@ -97,17 +101,19 @@ suspend fun <T> KotlinFunction.callByNamesSuspend(
  * Otherwise, calls the suspend function with current continuation.
  */
 suspend fun <T> KotlinFunction.callByIndicesSuspend(
+    instance: Any?,
     arguments: Map<Int, Any?>,
     isOptional: (Parameter) -> Boolean
 ): T {
 
     if (!isSuspend) {
         // Function is not suspend
-        return callByIndices(arguments, isOptional)
+        return callByIndices(instance, arguments, isOptional)
     }
 
     val result = suspendCoroutineUninterceptedOrReturn<T> { continuation ->
         callByIndices(
+            instance,
             arguments + (parameters.lastIndex to continuation),
             isOptional
         )
@@ -129,6 +135,7 @@ suspend fun <T> KotlinFunction.callByIndicesSuspend(
  * Otherwise, calls the suspend function with current continuation.
  */
 suspend fun <T> KotlinFunction.callByParametersSuspend(
+    instance: Any?,
     arguments: Map<Parameter, Any?>,
     isOptional: (Parameter) -> Boolean
 ): T {
@@ -136,11 +143,12 @@ suspend fun <T> KotlinFunction.callByParametersSuspend(
     val lastParameter = parameters.last()
     if (lastParameter.type != continuation()) {
         // Function is not suspend
-        return callByParameters(arguments, isOptional)
+        return callByParameters(instance, arguments, isOptional)
     }
 
     val result = suspendCoroutineUninterceptedOrReturn<T> { continuation ->
         callByParameters(
+            instance,
             arguments + (lastParameter to continuation),
             isOptional
         )
