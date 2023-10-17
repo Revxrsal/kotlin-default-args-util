@@ -114,17 +114,16 @@ Method greetMethod = Test.Companion.getClass().getDeclaredMethod("greet", String
 // the KotlinFunction wrapper
 //
 // note: the instance can be null if the function has @JvmStatic.
-KotlinFunction greet = KotlinFunction.wrap(
-        /* instance = */ Test.Companion,
-        /* method = */ greetMethod
-);
+KotlinFunction greet = KotlinFunction.wrap(greetMethod);
 
 greet.call(
+        /* instance = */ Test.Companion,
         /* arguments = */ emptyList(),
         /* isOptional = */ parameter -> true // All parameters are optional
 );
 
 greet.call(
+        /* instance = */ Test.Companion,
         /* arguments = */ singletonList("my friend"),
         /* isOptional = */ parameter -> true // All parameters are optional
 );
@@ -166,12 +165,10 @@ Method sumMethod = Numbers.class.getDeclaredMethod("numbers", int.class, int.cla
 // the KotlinFunction wrapper
 //
 // note: the instance can be null if the function has @JvmStatic.
-KotlinFunction sum = KotlinFunction.wrap(
-        /* instance = */ Numbers.INSTANCE,
-        /* method = */ sumMethod
-);
+KotlinFunction sum = KotlinFunction.wrap(sumMethod);
 
 sum.callByNames(
+        /* instance = */ Numbers.INSTANCE,
         /* arguments = */ new HashMap<String, Object>() {{
             put("a", 20);
             put("c", 400);
@@ -196,12 +193,10 @@ Method sumMethod = Numbers.class.getDeclaredMethod("numbers", int.class, int.cla
 // the KotlinFunction wrapper
 //
 // note: the instance can be null if the function has @JvmStatic.
-KotlinFunction sum = KotlinFunction.wrap(
-        /* instance = */ Numbers.INSTANCE,
-        /* method = */ sumMethod
-);
+KotlinFunction sum = KotlinFunction.wrap(sumMethod);
 
 sum.callByIndices(
+        /* instance = */ Numbers.INSTANCE,
         /* arguments = */ new HashMap<Integer, Object>() {{
             put(0, 20);  // parameter 'a'
             put(2, 400); // parameter 'c'
