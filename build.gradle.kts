@@ -1,6 +1,7 @@
 plugins {
     id("java")
     kotlin("jvm") version "1.8.0"
+    `maven-publish`
 }
 
 group = "revxrsal"
@@ -16,4 +17,12 @@ dependencies {
 
 kotlin {
     jvmToolchain(8)
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            from(components["java"])
+        }
+    }
 }
