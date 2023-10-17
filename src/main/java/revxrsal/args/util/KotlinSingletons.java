@@ -24,10 +24,11 @@
 package revxrsal.args.util;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import revxrsal.args.reflect.MethodCaller;
+ import revxrsal.args.reflect.MethodCaller;
 
-import java.lang.reflect.*;
+import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -35,17 +36,13 @@ import java.util.stream.Collectors;
 import static java.lang.reflect.Modifier.isPublic;
 import static java.lang.reflect.Modifier.isStatic;
 import static revxrsal.args.util.CollectionUtils.getOrNull;
-import static revxrsal.args.util.KotlinConstants.*;
+import static revxrsal.args.util.KotlinConstants.isJvmStatic;
+import static revxrsal.args.util.KotlinConstants.isStaticFinal;
 
 /**
  * A utility for finding the singleton inside a class
  */
 public final class KotlinSingletons {
-
-    /**
-     * The instance field name in object classes
-     */
-    private static final String SINGLETON_NAME = "INSTANCE";
 
     /**
      * NOTE: The companion field name is the same as the companion class
@@ -119,60 +116,11 @@ public final class KotlinSingletons {
         throw new IllegalStateException("Unable to find companion object.");
     }
 
-    public static Object findSingleton(Class<?> type) {
-        // 1. try to find the INSTANCE field
-        try {
-            Field singletonField = type.getDeclaredField(SINGLETON_NAME);
-            Object singleton = fetch(singletonField);
-            if (singleton != null)
-                return singleton;
-        } catch (NoSuchFieldException ignored) {
-        }
-
-        // 2. try to find any static final field whose type is our type
-        Field singletonField = findStaticFinal(type);
-        if (singletonField != null) {
-            Object singleton = fetch(singletonField);
-            if (singleton != null)
-                return singleton;
-        }
-
-        // 3. no singleton field was found, attempt to construct one
-        try {
-            Constructor<?> noArg = type.getDeclaredConstructor();
-            makeAccessible(noArg);
-            return noArg.newInstance();
-        } catch (NoSuchMethodException | InstantiationException | IllegalAccessException |
-                 InvocationTargetException ignored) {
-        }
-
-        // 4. no no-arg constructor was found, attempt to find Kotlin's synthetic constructor
-        try {
-            Constructor<?> synthetic = type.getDeclaredConstructor(defaultConstructorMarker());
-            makeAccessible(synthetic);
-            return synthetic.newInstance((Object) null);
-        } catch (NoSuchMethodException | InstantiationException | IllegalAccessException |
-                 InvocationTargetException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     // Auxiliary reflection methods
 
     private static void makeAccessible(@NotNull AccessibleObject accessibleObject) {
         if (!accessibleObject.isAccessible())
             accessibleObject.setAccessible(true);
-    }
-
-    private static @Nullable Field findStaticFinal(@NotNull Class<?> type) {
-        for (Field declaredField : type.getDeclaredFields()) {
-            if (declaredField.getType() != type)
-                continue;
-            int mods = declaredField.getModifiers();
-            if (isStaticFinal(mods))
-                return declaredField;
-        }
-        return null;
     }
 
     private static Object fetch(@NotNull Field field) {

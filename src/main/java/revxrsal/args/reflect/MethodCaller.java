@@ -23,12 +23,13 @@
  */
 package revxrsal.args.reflect;
 
-import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import revxrsal.args.util.Preconditions;
 
 import java.lang.reflect.Method;
+
+import static revxrsal.args.util.Preconditions.sneakyThrow;
 
 /**
  * A high-level wrapper, responsible for invoking methods reflectively.
@@ -77,9 +78,12 @@ public interface MethodCaller {
      * @param method Method to wrap into a {@link MethodCaller}
      * @return The method caller
      */
-    @SneakyThrows
     static MethodCaller wrap(@NotNull Method method) {
         Preconditions.checkNotNull(method, "method");
-        return MethodCallerFactory.methodHandles().createFor(method);
+        try {
+            return MethodCallerFactory.methodHandles().createFor(method);
+        } catch (Throwable e) {
+            throw sneakyThrow(e);
+        }
     }
 }

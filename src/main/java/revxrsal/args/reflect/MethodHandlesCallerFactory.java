@@ -23,7 +23,6 @@
  */
 package revxrsal.args.reflect;
 
-import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -32,10 +31,10 @@ import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static java.util.Collections.addAll;
+import static revxrsal.args.util.Preconditions.sneakyThrow;
 
 /**
  * A {@link MethodCallerFactory} that uses the method handles API to generate
@@ -52,16 +51,19 @@ final class MethodHandlesCallerFactory implements MethodCallerFactory {
         String methodString = method.toString();
         boolean isStatic = Modifier.isStatic(method.getModifiers());
         return new MethodCaller() {
-            @SneakyThrows
             @Override
             public Object call(@Nullable Object instance, Object... arguments) {
-                if (!isStatic) {
-                    List<Object> args = new ArrayList<>();
-                    args.add(instance);
-                    addAll(args, arguments);
-                    return handle.invokeWithArguments(args);
+                try {
+                    if (!isStatic) {
+                        List<Object> args = new ArrayList<>();
+                        args.add(instance);
+                        addAll(args, arguments);
+                        return handle.invokeWithArguments(args);
+                    }
+                    return handle.invokeWithArguments(arguments);
+                } catch (Throwable e) {
+                    throw sneakyThrow(e);
                 }
-                return handle.invokeWithArguments(arguments);
             }
 
             @Override

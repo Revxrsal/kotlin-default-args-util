@@ -23,7 +23,6 @@
  */
 package revxrsal.args;
 
-import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import revxrsal.args.reflect.MethodCaller;
@@ -128,7 +127,6 @@ final class DefaultFunctionFinder {
         );
     }
 
-    @SneakyThrows
     private static @NotNull MethodCaller bindInstanceParameter(Method method) {
         MethodCaller caller = MethodCaller.wrap(method);
         return (instance, arguments) -> {
