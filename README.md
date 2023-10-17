@@ -71,9 +71,7 @@ repositories {
 
 dependencies {
     implementation("com.github.Revxrsal:kotlin-default-args-util:(version)")
-
 }
-
 ```
 
 ### build.gradle.kts
@@ -112,10 +110,9 @@ Calling the function:
 Method greetMethod = Test.Companion.getClass().getDeclaredMethod("greet", String.class);
 
 // the KotlinFunction wrapper
-//
-// note: the instance can be null if the function has @JvmStatic.
 KotlinFunction greet = KotlinFunction.wrap(greetMethod);
 
+// note: the instance can be null if the function has @JvmStatic.
 greet.call(
         /* instance = */ Test.Companion,
         /* arguments = */ emptyList(),
@@ -163,10 +160,9 @@ Calling the function
 Method sumMethod = Numbers.class.getDeclaredMethod("numbers", int.class, int.class, int.class);
 
 // the KotlinFunction wrapper
-//
-// note: the instance can be null if the function has @JvmStatic.
 KotlinFunction sum = KotlinFunction.wrap(sumMethod);
 
+// note: the instance can be null if the function has @JvmStatic.
 sum.callByNames(
         /* instance = */ Numbers.INSTANCE,
         /* arguments = */ new HashMap<String, Object>() {{
@@ -191,10 +187,9 @@ Call the function using the indices of parameters. Zero represents the first par
 Method sumMethod = Numbers.class.getDeclaredMethod("numbers", int.class, int.class, int.class);
 
 // the KotlinFunction wrapper
-//
-// note: the instance can be null if the function has @JvmStatic.
 KotlinFunction sum = KotlinFunction.wrap(sumMethod);
 
+// note: the instance can be null if the function has @JvmStatic.
 sum.callByIndices(
         /* instance = */ Numbers.INSTANCE,
         /* arguments = */ new HashMap<Integer, Object>() {{
