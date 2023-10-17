@@ -1,3 +1,8 @@
+[![Discord](https://discord.com/api/guilds/939962855476846614/widget.png)](https://discord.gg/pEGGF785zp)
+[![](https://jitpack.io/v/Revxrsal/kotlin-default-args-util.svg)](https://jitpack.io/#Revxrsal/kotlin-default-args-util)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Build](https://github.com/Revxrsal/kotlin-default-args-util/actions/workflows/gradle.yml/badge.svg)](https://github.com/Revxrsal/kotlin-default-args-util/actions/workflows/gradle.yml)
+
 # kotlin-default-args
 
 **kotlin-default-args-util** is a library that attempts to bring two of the most prominent features in Kotlin to the
